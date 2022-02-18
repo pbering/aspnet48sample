@@ -9,5 +9,6 @@ namespace aspnet48sample.Models
         public string AspNetVersion { get; internal set; }
         public IOrderedEnumerable<KeyValuePair<string, string>> EnvironmentVariables { get; set; }
         public IOrderedEnumerable<KeyValuePair<string, string>> ServerVariables { get; set; }
+        public string IpAddress { get; set; }
     }
 }

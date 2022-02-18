@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web.Mvc;
 
 namespace aspnet48sample.Controllers
@@ -14,7 +15,8 @@ namespace aspnet48sample.Controllers
             var model = new DataModel
             {
                 MachineName = Environment.MachineName,
-                AspNetVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName
+                AspNetVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName,
+                IpAddress = string.Join(", ", Dns.GetHostEntry(Dns.GetHostName()).AddressList.ToList())
             };
 
             var environmentVariables = new Dictionary<string, string>();

@@ -8,8 +8,9 @@
 
     <h3>Summary</h3>
     <code>
+        <b>IP Addresses</b>: @Model.IpAddress<br />
         <b>COMPUTERNAME</b>: @Model.MachineName<br />
-        <b>OS</b>: @Model.EnvironmentVariables.First(x=>x.Key == "OS").Value<br />
+        <b>OS</b>: @Model.EnvironmentVariables.First(x => x.Key == "OS").Value<br />
         <b>ASP.NET Version</b>: @Model.AspNetVersion<br />
     </code>
 
