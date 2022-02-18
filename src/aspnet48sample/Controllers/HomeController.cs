@@ -10,13 +10,16 @@ namespace aspnet48sample.Controllers
 {
     public class HomeController : Controller
     {
+        private static readonly Lazy<string> _targetFrameworkName = new Lazy<string>(() => AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName);
+        private static readonly Lazy<string> _ipAddress = new Lazy<string>(() => string.Join(", ", Dns.GetHostEntry(Dns.GetHostName()).AddressList.ToList()));
+
         public ActionResult Index()
         {
             var model = new DataModel
             {
                 MachineName = Environment.MachineName,
-                AspNetVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName,
-                IpAddress = string.Join(", ", Dns.GetHostEntry(Dns.GetHostName()).AddressList.ToList())
+                AspNetVersion = _targetFrameworkName.Value,
+                IpAddress = _ipAddress.Value
             };
 
             var environmentVariables = new Dictionary<string, string>();
