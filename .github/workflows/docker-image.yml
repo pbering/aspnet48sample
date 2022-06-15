@@ -14,5 +14,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Build
-      run: docker build . --tag aspnet48sample:$(date +%s)
+      shell: pwsh
+      run: |
+        $tag = "aspnet48sample:latest"
+        docker build --tag $tag .
+        echo $GITHUB_TOKEN| docker login ghcr.io -u pbering --password-stdin
+        docker push $tag
