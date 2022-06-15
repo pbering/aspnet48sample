@@ -1,5 +1,7 @@
 FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2019 as build
 
+LABEL org.opencontainers.image.source https://github.com/pbering/aspnet48sample
+
 WORKDIR "/workspace"
 
 COPY . .
