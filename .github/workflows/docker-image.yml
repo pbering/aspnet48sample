@@ -1,24 +1,25 @@
-name: Docker Image CI
+name: CI
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
-
   build:
-
     runs-on: windows-latest
-
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Build
-      shell: pwsh
-      run: |
-        $tag = "aspnet48sample:latest"
-        docker build --tag $tag .
-        echo $GITHUB_TOKEN| docker login ghcr.io -u pbering --password-stdin
-        docker push $tag
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker build
+        shell: pwsh
+        run: |
+          $tag = "aspnet48sample:1.0-ltsc2019"
+          docker build --tag $tag .
+          docker push $tag
