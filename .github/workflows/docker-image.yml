@@ -20,6 +20,6 @@ jobs:
       - name: Docker build
         shell: pwsh
         run: |
-          $tag = "aspnet48sample:1.0-ltsc2019"
+          $tag = "ghcr.io/pbering/aspnet48sample:1.0-ltsc2019"
           docker build --tag $tag .
           docker push $tag
