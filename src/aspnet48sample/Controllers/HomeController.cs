@@ -10,6 +10,7 @@ namespace aspnet48sample.Controllers
     public class HomeController : Controller
     {
         private static readonly Lazy<string> _targetFrameworkName = new Lazy<string>(() => AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName);
+        private static readonly Lazy<IDictionary> _environmentVariables = new Lazy<IDictionary>(() => Environment.GetEnvironmentVariables());
         private static readonly Lazy<IPAddress[]> _ipAddress = new Lazy<IPAddress[]>(() => Dns.GetHostEntry(Dns.GetHostName()).AddressList);
 
         public ActionResult Index()
@@ -49,7 +50,7 @@ namespace aspnet48sample.Controllers
         {
             var body = new StringBuilder();
                       
-            foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
+            foreach (DictionaryEntry entry in _environmentVariables.Value)
             {
                 body.AppendFormat("{0}: {1}", entry.Key.ToString(), entry.Value.ToString());
                 body.AppendLine();
