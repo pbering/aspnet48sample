@@ -1,9 +1,8 @@
-﻿using aspnet48sample.Models;
-using System;
+﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Web.Mvc;
 
 namespace aspnet48sample.Controllers
@@ -15,32 +14,37 @@ namespace aspnet48sample.Controllers
 
         public ActionResult Index()
         {
-            var model = new DataModel
-            {
-                MachineName = Environment.MachineName,
-                AspNetVersion = _targetFrameworkName.Value,
-                IpAddress = _ipAddress.Value
-            };
+            var body = new StringBuilder();
 
-            var environmentVariables = new Dictionary<string, string>();
+            body.AppendLine("# INFO");
+            body.AppendLine();
+            body.AppendFormat("MachineName: {0}", Environment.MachineName);
+            body.AppendLine();
+            body.AppendFormat("AspNetVersion: {0}", _targetFrameworkName.Value);
+            body.AppendLine();
+            body.AppendFormat("IpAddresses: {0}", _ipAddress.Value);
+            body.AppendLine();
 
-            foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
-            {
-                environmentVariables.Add(entry.Key.ToString(), entry.Value.ToString());
-            }
-
-            model.EnvironmentVariables = environmentVariables.OrderBy(x => x.Key);
-
-            var serverVariables = new Dictionary<string, string>();
+            body.AppendLine();
+            body.AppendLine("# SERVER VARIABLES");
+            body.AppendLine();
 
             foreach (string entry in Request.ServerVariables)
             {
-                serverVariables.Add(entry, Request.ServerVariables[entry]);
+                body.AppendFormat("{0}: {1}", entry, Request.ServerVariables[entry]);
             }
 
-            model.ServerVariables = serverVariables.OrderBy(x => x.Key);
+            body.AppendLine();
+            body.AppendLine();
+            body.AppendLine("# ENVIRONMENT VARIABLES");
 
-            return View(model);
+            foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
+            {
+                body.AppendFormat("{0}: {1}", entry.Key.ToString(), entry.Value.ToString());
+                body.AppendLine();
+            }
+
+            return Content(body.ToString(), "text/plain");
         }
     }
 }

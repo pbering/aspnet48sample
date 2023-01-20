@@ -1,5 +1,4 @@
-﻿using System.Web.Mvc;
-using System.Web.Routing;
+﻿using System.Web.Routing;
 
 namespace aspnet48sample
 {
@@ -7,8 +6,6 @@ namespace aspnet48sample
     {
         protected void Application_Start()
         {
-            AreaRegistration.RegisterAllAreas();
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
     }
