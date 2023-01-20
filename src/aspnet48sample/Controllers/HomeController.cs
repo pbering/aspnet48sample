@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -9,54 +10,79 @@ namespace aspnet48sample.Controllers
 {
     public class HomeController : Controller
     {
-        private static readonly Lazy<string> _targetFrameworkName = new Lazy<string>(() => AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName);
-        private static readonly Lazy<IDictionary> _environmentVariables = new Lazy<IDictionary>(() => Environment.GetEnvironmentVariables());
-        private static readonly Lazy<IPAddress[]> _ipAddress = new Lazy<IPAddress[]>(() => Dns.GetHostEntry(Dns.GetHostName()).AddressList);
+        private static readonly Lazy<string> _targetFrameworkName = new(() => AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName);
+        private static readonly Lazy<IEnumerable<KeyValuePair<string, string>>> _ipAddress = new(GetIpAddresses);
+        private static readonly Lazy<IEnumerable<KeyValuePair<string, string>>> _environmentVariables = new(GetEnvironmentVariables);
 
         public ActionResult Index()
         {
-            var body = new StringBuilder();
+            var values = new List<KeyValuePair<string, string>>(_ipAddress.Value);
 
-            body.AppendFormat("Hostname: {0}", Environment.MachineName);
-            body.AppendLine();
-            
-            foreach (var entry in _ipAddress.Value)
-            {
-                body.AppendFormat("IP: {0}", entry);
-                body.AppendLine();
-            }
-            
-            body.AppendFormat("AspNetVersion: {0}", _targetFrameworkName.Value);
-            body.AppendLine();
-            body.AppendLine("ServerVariables: /srv");
-            body.AppendLine("EnvironmentVariables: /env");
-            
-            return Content(body.ToString(), "text/plain");
+            values.Insert(0, new KeyValuePair<string, string>("Hostname", Environment.MachineName));
+            values.Add(new KeyValuePair<string, string>("AspNetVersion", _targetFrameworkName.Value));
+            values.Add(new KeyValuePair<string, string>("ServerVariables", "/srv"));
+            values.Add(new KeyValuePair<string, string>("EnvironmentVariables", "/env"));
+
+            return RenderValues(values);
         }
 
         public ActionResult ServerVariables()
         {
-            var body = new StringBuilder();
+            var values = new Dictionary<string, string>();
 
             foreach (string entry in Request.ServerVariables)
             {
-                body.AppendFormat("{0}: {1}", entry, Request.ServerVariables[entry]);
+                if (entry == "ALL_RAW" || entry == "ALL_HTTP")
+                {
+                    continue;
+                }
+
+                values.Add(entry, Request.ServerVariables[entry]);
+            }
+
+            return RenderValues(values.OrderBy(x => x.Key));
+        }
+
+        public ActionResult EnvironmentVariables()
+        {
+            return RenderValues(_environmentVariables.Value);
+        }
+
+        private ActionResult RenderValues(IEnumerable<KeyValuePair<string, string>> values)
+        {
+            var body = new StringBuilder();
+
+            foreach (var entry in values)
+            {
+                body.AppendFormat("{0}: {1}", entry.Key, entry.Value);
+                body.AppendLine();
             }
 
             return Content(body.ToString(), "text/plain");
         }
 
-        public ActionResult EnvironmentVariables()
+        private static IEnumerable<KeyValuePair<string, string>> GetIpAddresses()
         {
-            var body = new StringBuilder();
-                      
-            foreach (DictionaryEntry entry in _environmentVariables.Value)
+            var values = new List<KeyValuePair<string, string>>();
+
+            foreach (var ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
             {
-                body.AppendFormat("{0}: {1}", entry.Key.ToString(), entry.Value.ToString());
-                body.AppendLine();
+                values.Add(new KeyValuePair<string, string>("IP", ip.ToString()));
             }
 
-            return Content(body.ToString(), "text/plain");
+            return values;
+        }
+
+        private static IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
+        {
+            var values = new Dictionary<string, string>();
+
+            foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
+            {
+                values.Add(entry.Key.ToString(), entry.Value.ToString());
+            }
+
+            return values.OrderBy(x => x.Key);
         }
     }
 }
