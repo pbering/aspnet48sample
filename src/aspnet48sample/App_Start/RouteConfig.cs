@@ -9,9 +9,19 @@ namespace aspnet48sample
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.MapRoute(
+                 name: "EnvironmentVariables",
+                 url: "env",
+                 defaults: new { controller = "Home", action = "EnvironmentVariables" }
+            );
+            routes.MapRoute(
+                 name: "ServerVariables",
+                 url: "srv",
+                 defaults: new { controller = "Home", action = "ServerVariables" }
+            );
+            routes.MapRoute(
                 name: "Default",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                url: "{controller}/{action}",
+                defaults: new { controller = "Home", action = "Index" }
             );
         }
     }
