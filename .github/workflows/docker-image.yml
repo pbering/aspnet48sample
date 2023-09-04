@@ -5,7 +5,7 @@ on:
     branches: ["master"]
 
 jobs:
-  build:
+  build_2019:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v3
@@ -17,18 +17,34 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker build 2019
+      - name: Docker build
         shell: pwsh
         run: |
           $platform = "windowsservercore-ltsc2019"
+          $build_image = "mcr.microsoft.com/dotnet/framework/sdk:4.8-$platform"
+          $runtime_tmage = "mcr.microsoft.com/dotnet/framework/aspnet:4.8-$platform"
           $tag = "ghcr.io/pbering/aspnet48sample:1.0-$platform"
-          docker build --build-arg platform=$platform --tag $tag .
+          docker build --build-arg BUILD_IMAGE=$build_image --build-arg RUNTIME_IMAGE=$runtime_tmage --tag $tag .
           docker push $tag
 
-      - name: Docker build 2022
+  build_2022:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker build
         shell: pwsh
         run: |
           $platform = "windowsservercore-ltsc2022"
+          $build_image = "mcr.microsoft.com/dotnet/framework/sdk:4.8-$platform"
+          $runtime_tmage = "mcr.microsoft.com/dotnet/framework/aspnet:4.8-$platform"
           $tag = "ghcr.io/pbering/aspnet48sample:1.0-$platform"
-          docker build --build-arg platform=$platform --tag $tag .
+          docker build --build-arg BUILD_IMAGE=$build_image --build-arg RUNTIME_IMAGE=$runtime_tmage --tag $tag .
           docker push $tag
