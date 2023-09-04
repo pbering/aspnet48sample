@@ -17,9 +17,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker build
+      - name: Docker build 2019
         shell: pwsh
         run: |
-          $tag = "ghcr.io/pbering/aspnet48sample:1.0-windowsservercore-ltsc2019"
-          docker build --tag $tag .
+          $platform = "windowsservercore-ltsc2019"
+          $tag = "ghcr.io/pbering/aspnet48sample:1.0-$platform"
+          docker build --build-arg platform=$platform --tag $tag .
+          docker push $tag
+
+      - name: Docker build 2022
+        shell: pwsh
+        run: |
+          $platform = "windowsservercore-ltsc2022"
+          $tag = "ghcr.io/pbering/aspnet48sample:1.0-$platform"
+          docker build --build-arg platform=$platform --tag $tag .
           docker push $tag
